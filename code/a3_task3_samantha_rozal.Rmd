@@ -4,27 +4,75 @@ author: "Sam Rozal"
 date: "10/24/2021"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
+#Setup
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#attach packages
+library(here)
+library(tidyverse)
+library(janitor)
+library(DT)
+library(plotly)
 ```
 
-## R Markdown
+# Read In the Data 
+```{r}
+#read in urchin data using read_csv
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+urchins <- read_csv(here("data", "urchins.csv"))
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+# Section 1
+Size Comparison of purple and red urchins
 
-You can also embed plots, for example:
+## Data Visulaization
+Compare distribution of sizes between red and purple urchins with a histogram 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+### Data Wrangling: 
+```{r}
+urchins_clean <- clean_names(urchins)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### Data Visulaiztaion:
+```{r}
+ggplot(data=urchins_clean, aes(x=size)) +
+  geom_histogram(aes(fill=common_name))+
+  facet_wrap(~common_name) +
+  labs(x="Urchin Diameter (cm)", 
+       y= "Urchin Count", 
+       title= "Distribution of Purple and Red Urchin Sizes")+
+  theme_bw()
+
+```
+Figure 1. I need to add a cation here XD
+
+### Descriptive Statistics Table
+
+```{r}
+urchins_summary <- urchins_clean %>% 
+  group_by(common_name) %>%
+  summarize(mean_urchin_size = mean(size),
+            median_urchin_size = median(size),
+            sd_urchin_size = sd(size),
+            urchin_sample_size = n())
+urchins_summary
+
+```
+
+Section iii of Section 1-- I need to add a 2-3 sentanece description...
+
+
+
+
+
+
+
+
+create a subset entitled `purple_urchins` by filtering only for purple urchins using the `filter()` function
+```{r}
+purple_urchins <- urchins_clean %>%
+  filter(common_name == "Purple Urchin")
+
+```
+
