@@ -13,6 +13,7 @@ library(tidyverse)
 library(janitor)
 library(DT)
 library(plotly)
+library(lubridate)
 ```
 
 # Read In the Data 
@@ -64,15 +65,13 @@ Section iii of Section 1-- I need to add a 2-3 sentanece description...
 
 
 
+# Section 2
 
-
-
-
-
+### Explore purple urchin counts by site and year
 create a subset entitled `purple_urchins` by filtering only for purple urchins using the `filter()` function
 ```{r}
 purple_urchins <- urchins_clean %>%
-  filter(common_name == "Purple Urchin")
+  filter(common_name == "Purple Urchin") 
 
 ```
 
