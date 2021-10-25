@@ -72,7 +72,26 @@ create a subset entitled `purple_urchins` by filtering only for purple urchins u
 ```{r}
 purple_urchins <- urchins_clean %>%
   filter(common_name == "Purple Urchin") %>% 
-  mutate(new_date=mdy(date))
+  mutate(new_date=mdy(date)) %>%
+  mutate(year_new = year(new_date)) %>%
+  mutate(site_full = case_when(
+    site == "NAPL" ~ "Naples Reef",
+    site == "AQUE" ~ "Arroyo Quemado Reef",
+    site == "CARP" ~ "Carpinteria Reef",
+    site == "MOHK" ~ "Mohawk Reef",
+    site == "IVEE" ~ "Isla Vista Reef"
+  ))
+  
+```
 
+write code to store table that has the total number of purple urchins observed by site and year 
+
+```{r}
+purple_urchins_total <- purple_urchins %>%
+  group_by(year_new) %>% 
+  summarize(n()) 
+  
+    
+purple_urchins_total
 ```
 
