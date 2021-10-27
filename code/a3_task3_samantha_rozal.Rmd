@@ -5,7 +5,7 @@ date: "10/24/2021"
 output: html_document
 ---
 #Setup
-```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+```{r setup, include=TRUE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 #attach packages
 library(here)
@@ -68,7 +68,7 @@ Section iii of Section 1-- I need to add a 2-3 sentanece description...
 # Section 2
 
 ### Explore purple urchin counts by site and year
-create a subset entitled `purple_urchins` by filtering only for purple urchins using the `filter()` function and convert the date class to "Date"
+Create a subset entitled `purple_urchins` by filtering only for purple urchins using the `filter()` function and convert the date class to "Date"
 ```{r}
 purple_urchins <- urchins_clean %>%
   filter(common_name == "Purple Urchin") %>% 
@@ -81,17 +81,27 @@ purple_urchins <- urchins_clean %>%
     site == "MOHK" ~ "Mohawk Reef",
     site == "IVEE" ~ "Isla Vista Reef"
   ))
-  
+
+class(purple_urchins$year_new)
 ```
 
 write code to store table that has the total number of purple urchins observed by site and year 
 
 ```{r}
 purple_urchins_total <- purple_urchins %>%
-  group_by(year_new) %>% 
-  summarize(n()) 
-  
+  group_by(site,year_new) %>% 
+  summarize(count=n())
     
 purple_urchins_total
+```
+# Data Visulaization 
+ Create a finalized graph of counts of purple urchins recorded at each site
+```{r}
+ggplot(data= purple_urchins_total, aes(x= year_new,y=count)) +
+  geom_line(aes(color=site))+
+  scale_x_continuous(breaks= seq(from = 2007, to= 2020,by=1)) +
+  labs(x="Year",
+       y= "Urchin count",
+       title= "Urchins count by size and year")
 ```
 
