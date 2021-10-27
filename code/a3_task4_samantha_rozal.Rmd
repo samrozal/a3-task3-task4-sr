@@ -19,4 +19,31 @@ library(lubridate)
 #read in data using read_csv
 urchinst4 <- read_csv(here("data", "urchins.csv"))
 ```
+# Data Wrangling 
+A new subset of data called `naples_reef_urchins_2010` is creted to only include observations of  purple urchins from naples reef in 2010
+
+first, cleannames using `clean_names()
+```{r}
+urchinst4_clean <- clean_names(urchinst4)
+```
+
+Date is first converted to code-friendly notation using `lubridate`
+
+```{r}
+naples_reef_urchins_2010 <- urchinst4_clean %>%
+  mutate(new_date=mdy(date)) %>% 
+  mutate(new_year=year(new_date)) %>% 
+  filter(new_year=="2010")
+```
+
+# Data Visulaization 
+```{r}
+ggplot(data= naples_reef_urchins_2010, aes(x=size)) +
+  geom_histogram(fill="purple") 
+  
+```
+```{r}
+ggplot(data=naples_reef_urchins_2010, aes(sample=size)) +
+  geom_qq()
+```
 
