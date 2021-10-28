@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
 library(lubridate)
+library(kableExtra)
 
 ```
 
@@ -20,30 +21,59 @@ library(lubridate)
 urchinst4 <- read_csv(here("data", "urchins.csv"))
 ```
 # Data Wrangling 
-A new subset of data called `naples_reef_urchins_2010` is creted to only include observations of  purple urchins from naples reef in 2010
+A new subset of data called `naples_reef_urchins_2010` is created to only include observations of  purple urchins from napes reef in 2010
 
-first, cleannames using `clean_names()
+first, clean names using `clean_names()
 ```{r}
-urchinst4_clean <- clean_names(urchinst4)
+#convert names to lower snake case using 
+urchinst4_clean <- clean_names(urchinst4) 
 ```
 
-Date is first converted to code-friendly notation using `lubridate`
-
+ 
 ```{r}
-naples_reef_urchins_2010 <- urchinst4_clean %>%
-  mutate(new_date=mdy(date)) %>% 
-  mutate(new_year=year(new_date)) %>% 
-  filter(new_year=="2010")
+purple_urchins_naples <- urchinst4_clean %>%
+  filter(common_name =="Purple Urchin") %>% 
+  filter(site == "NAPL")
+```
+
+Convert date to code-friendly notation using `lubridate` functions, and then filter out urchin data only for 2010. 
+```{r}
+naples_reef_urchins_2010 <- purple_urchins_naples %>%
+  mutate(new_date=mdy(date)) %>% #create new column with converted dates
+  mutate(new_year=year(new_date)) %>% #use year()function to make a new column with just the year, used for filtering 
+  filter(new_year=="2010") #filter out for data 
 ```
 
 # Data Visulaization 
+
 ```{r}
 ggplot(data= naples_reef_urchins_2010, aes(x=size)) +
-  geom_histogram(fill="purple") 
+  geom_histogram() +
+  labs(x= "Urchin Size",
+       y= "Count of Urchins",
+       title= "Size distribution of Purple Urchins (Naples Reef, 2010)") +
+  facet_wrap(~treatment) 
   
 ```
+
+Create an exploratory qq plot for the size distribution of purple 
 ```{r}
 ggplot(data=naples_reef_urchins_2010, aes(sample=size)) +
-  geom_qq()
+  geom_qq_line() +
+  geom_qq() +
+  facet_wrap(~treatment)
+```
+
+```{r}
+naples_reef_urchins_2010_summary <- naples_reef_urchins_2010 %>% 
+  group_by(treatment) %>% 
+  summarize()
+```
+
+
+```{r}
+kable(naples_reef_urchins_2010, 
+      col.names = c())
+
 ```
 

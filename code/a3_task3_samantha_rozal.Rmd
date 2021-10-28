@@ -6,7 +6,7 @@ output: html_document
 ---
 #Setup
 ```{r setup, include=TRUE, message=FALSE, warning=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning= FALSE)
 #attach packages
 library(here)
 library(tidyverse)
@@ -14,6 +14,7 @@ library(janitor)
 library(DT)
 library(plotly)
 library(lubridate)
+library(kableExtra)
 ```
 
 # Read In the Data 
@@ -36,7 +37,7 @@ urchins_clean <- clean_names(urchins)
 ```
 
 ### Data Visulaiztaion:
-```{r}
+```{r, fig.cap= "yayyyy urchins"}
 ggplot(data=urchins_clean, aes(x=size)) +
   geom_histogram(aes(fill=common_name))+
   facet_wrap(~common_name) +
@@ -53,15 +54,26 @@ Figure 1. I need to add a cation here XD
 ```{r}
 urchins_summary <- urchins_clean %>% 
   group_by(common_name) %>%
-  summarize(mean_urchin_size = mean(size),
-            median_urchin_size = median(size),
-            sd_urchin_size = sd(size),
+  summarize(mean_urchin_size = round(mean(size, na.rm=TRUE), 2),
+            median_urchin_size = median(size, na.rm=TRUE),
+            sd_urchin_size = round(sd(size, na.rm=TRUE),2),
             urchin_sample_size = n())
-urchins_summary
+urchins_summary 
 
 ```
 
-Section iii of Section 1-- I need to add a 2-3 sentanece description...
+Create and return a really awesomely formatted table using the kableExtra package
+```{r}
+kable(urchins_summary,col.names=c("Common Name", 
+                            "Mean Urchin Size (cm)", 
+                            "Median Urchin Size (cm)", 
+                            "Standard Deviation (cm)",
+                            "Sample Size(n)")) %>% 
+  kable_styling()
+```
+
+
+Section iii of Section 1-- I need to add a 2-3 sentence description...
 
 
 
@@ -82,14 +94,14 @@ purple_urchins <- urchins_clean %>%
     site == "IVEE" ~ "Isla Vista Reef"
   ))
 
-class(purple_urchins$year_new)
+class(purple_urchins$new_date)
 ```
 
 write code to store table that has the total number of purple urchins observed by site and year 
 
 ```{r}
 purple_urchins_total <- purple_urchins %>%
-  group_by(site,year_new) %>% 
+  group_by(site_full,year_new) %>% 
   summarize(count=n())
     
 purple_urchins_total
@@ -98,10 +110,12 @@ purple_urchins_total
  Create a finalized graph of counts of purple urchins recorded at each site
 ```{r}
 ggplot(data= purple_urchins_total, aes(x= year_new,y=count)) +
-  geom_line(aes(color=site))+
+  geom_line(aes(color=site_full, na.rm=TRUE))+
   scale_x_continuous(breaks= seq(from = 2007, to= 2020,by=1)) +
   labs(x="Year",
        y= "Urchin count",
-       title= "Urchins count by size and year")
+       title= "Urchins count by size and year",
+       color="Site") 
+  
 ```
 
