@@ -1,17 +1,22 @@
 ---
-title: "a3_task4_samantha_rozal"
+title: "Task 4- Naples Reef (2010) Purple Urchins (Rozal) "
 author: "Sam Rozal"
 date: "10/24/2021"
 output: html_document
 ---
+# Overview:
+This code wrangles and then visualizes experimental data collected by Santa Barbara Coastal Long Term Ecological Research Program of  Purple Urchins  observed at Naples Reef in 2010. Specifically, a comparison between purple urchin size in an experimental kelp forest where kelp is removed on an annual basis and purple urchin size in a control kelp forest where kelp is not removed yearly, is drawn. This is explored in unfinalized histograms and a qq plot and fully demonstrated in a summarized statistic table. 
+
+Data: Reed, D. 2020. SBC LTER: Reef: Long-term experiment: Kelp removal: Urchin size frequency distribution ver 20. Environmental Data Initiative.[https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b](https://doi.org/10.6073/pasta/5a1e9ef03aa47bd2225c0bb98a02a63b.)
 
 # Setup
-```{r setup, include=FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=TRUE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message= FALSE)
 library(tidyverse)
 library(here)
 library(lubridate)
 library(kableExtra)
+library(janitor)
 
 ```
 
@@ -23,20 +28,20 @@ urchinst4 <- read_csv(here("data", "urchins.csv"))
 # Data Wrangling 
 A new subset of data called `naples_reef_urchins_2010` is created to only include observations of  purple urchins from napes reef in 2010
 
-first, clean names using `clean_names()
+Clean names using `clean_names()` function 
 ```{r}
 #convert names to lower snake case using 
 urchinst4_clean <- clean_names(urchinst4) 
 ```
 
- 
+A new subset of data called `purple_urchins_naples` is created to only include observations for purple urchins found at the naples site.
 ```{r}
-purple_urchins_naples <- urchinst4_clean %>%
-  filter(common_name =="Purple Urchin") %>% 
-  filter(site == "NAPL")
+purple_urchins_naples <- urchinst4_clean %>% 
+  filter(common_name =="Purple Urchin") %>% #filter to only include purple urchins
+  filter(site == "NAPL") #filter to only include naples site
 ```
 
-Convert date to code-friendly notation using `lubridate` functions, and then filter out urchin data only for 2010. 
+Date is converted to code-friendly notation using `lubridate` functions, and then filter out urchin data only for 2010. 
 ```{r}
 naples_reef_urchins_2010 <- purple_urchins_naples %>%
   mutate(new_date=mdy(date)) %>% #create new column with converted dates
@@ -44,36 +49,51 @@ naples_reef_urchins_2010 <- purple_urchins_naples %>%
   filter(new_year=="2010") #filter out for data 
 ```
 
-# Data Visulaization 
-
+# Data Visualization- Exploratory graphs
+A histogram is created in ggplot using the `geom_histogram()` function. To compare the distribution between the experimental treatment (annual) and the control, they are facet wrapped using the `facet_wrap` function.
 ```{r}
 ggplot(data= naples_reef_urchins_2010, aes(x=size)) +
-  geom_histogram() +
+  geom_histogram(aes(fill=treatment, binwidth=10)) + #create a histogram
   labs(x= "Urchin Size",
        y= "Count of Urchins",
-       title= "Size distribution of Purple Urchins (Naples Reef, 2010)") +
-  facet_wrap(~treatment) 
+       title= "Size distribution of Purple Urchins (Naples Reef, 2010)") + #create labels
+  facet_wrap(~treatment) # separate by treatment 
   
 ```
 
-Create an exploratory qq plot for the size distribution of purple 
+An exploratory qq plot for the size distribution of purple is created in gplot using the `geom_qq()` function. The qq line is added for reference using the `geom_qq_line()` function
 ```{r}
 ggplot(data=naples_reef_urchins_2010, aes(sample=size)) +
-  geom_qq_line() +
-  geom_qq() +
-  facet_wrap(~treatment)
+  geom_qq_line() + #add qq plot line to serve as a reference
+  geom_qq() + #make the qq plot graph 
+  facet_wrap(~treatment) #sepertae by treatment 
 ```
 
+### Overall takeaways
+When comparing the spread of the data in the histograms, it appears that both the urchins in the experimental group (where kelp is removed every year) and in the control group follow a relatively normal distribution, although there is a slightly skew towards smaller urchin sizes in the experimental group. This is supported by the qq plot, where the trend exhibited in the experiment follows a mostly linear pattern, which demonstrates that the observed data is somewhat close to what would be expected in a theoretical normal distribution. 
+
+# Create a Summary Table
+A data frame called `naples_reef_urchins_2010_summary` is created using the group_by() and summarize() functions.
 ```{r}
 naples_reef_urchins_2010_summary <- naples_reef_urchins_2010 %>% 
-  group_by(treatment) %>% 
-  summarize()
+  group_by(treatment) %>% #group by treatment
+  summarize(mean_urchin_size = round(mean(size, na.rm=TRUE), 2),
+            median_urchin_size = median(size, na.rm=TRUE),
+            sd_urchin_size = round(sd(size, na.rm=TRUE),2),
+            urchin_sample_size = n()) # calculate summary statistics and round to two decimal pts.  
+  
 ```
 
+## Final Summary Table 
 
+A final summary table is created using the `kable()` function and the `naples_reef_urchins_2010_summary`  
 ```{r}
-kable(naples_reef_urchins_2010, 
-      col.names = c())
+kable(naples_reef_urchins_2010_summary, col.names = c("Treatment", 
+                    "Mean Urchin Size (cm)", 
+                    "Median Urchin Size(cm)", 
+                    "Standard Deviation (cm)", 
+                    "Urchin Sample Size (n)"), caption= "Table 1. Comparison of Urchin sizes observed in the the two experimental kelp treatments at Naples Reef in 2010. ANNUAL referes to the primary experimental group where the giant kelp is removed and allowed to re-colinize and CONTROL refers to the control group where seaweed is left intact.There was a 5.4% difference between the mean annual observations and the mean control group and a 12.5% difference between median annual observations and the median control group.") %>% # rename columns and add caption 
+  kable_styling() # Cool styling 
 
 ```
 
