@@ -4,7 +4,7 @@ author: "Sam Rozal"
 date: "10/24/2021"
 output: html_document
 ---
-#Setup
+# Setup
 ```{r setup, include=TRUE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning= FALSE)
 #attach packages
@@ -32,12 +32,14 @@ Size Comparison of purple and red urchins
 Compare distribution of sizes between red and purple urchins with a histogram 
 
 ### Data Wrangling: 
+Clean names using clean_names()function
 ```{r}
 urchins_clean <- clean_names(urchins)
 ```
 
 ### Data Visulaiztaion:
-```{r, fig.cap= "yayyyy urchins"}
+A histogram is created in ggplot to compare the different size distribution of red and purple urchins. This is completed using the `facet_wrap()` function to separate out by urchin type in the histograms. 
+```{r, fig.cap= "Figure 1. **Comprison of size distribution between Red and Purple Urchins.** Red Urchin size distribution is more normally distributed than that of Purple Urchin size distribution. The size distribution of Purple Urchins is skewed toward lower values in comaprision to the size distribution of Red Urchins, indicating that, on average, Purple Urchins are larger than Red Urchins."}
 ggplot(data=urchins_clean, aes(x=size)) +
   geom_histogram(aes(fill=common_name))+
   facet_wrap(~common_name) +
@@ -47,10 +49,10 @@ ggplot(data=urchins_clean, aes(x=size)) +
   theme_bw()
 
 ```
-Figure 1. I need to add a cation here XD
 
 ### Descriptive Statistics Table
 
+A summary table is created using the `group_by()` and `summarize()` function for the mean, median, standard deviation, and sample size for both red and purple urchins. 
 ```{r}
 urchins_summary <- urchins_clean %>% 
   group_by(common_name) %>%
@@ -62,14 +64,14 @@ urchins_summary
 
 ```
 
-Create and return a really awesomely formatted table using the kableExtra package
-```{r}
+Create and return a really awesomely formatted table using the `kableExtra` package. This is completed by using the `kable()` function and the `urchin_summary` data frame created in the last step
+```{r, tab.caption= "Yay urchins"}
 kable(urchins_summary,col.names=c("Common Name", 
                             "Mean Urchin Size (cm)", 
                             "Median Urchin Size (cm)", 
                             "Standard Deviation (cm)",
-                            "Sample Size(n)")) %>% 
-  kable_styling()
+                            "Sample Size(n)"),caption= "Table 1: Summary Statistics for Purple and Red Urchins") %>% 
+  kable_styling() #kable_styling() package formats the table to be nicer
 ```
 
 
@@ -97,8 +99,7 @@ purple_urchins <- urchins_clean %>%
 class(purple_urchins$new_date)
 ```
 
-write code to store table that has the total number of purple urchins observed by site and year 
-
+A data frame, called `purple_urchin_total` is creted using the` group_by()` and `summarize()` functions to store table that has the total number of purple urchins observed by site and year. 
 ```{r}
 purple_urchins_total <- purple_urchins %>%
   group_by(site_full,year_new) %>% 
@@ -107,15 +108,15 @@ purple_urchins_total <- purple_urchins %>%
 purple_urchins_total
 ```
 # Data Visulaization 
- Create a finalized graph of counts of purple urchins recorded at each site
-```{r}
+A finalized graph of counts of purple urchins recorded at each site is created in ggplot using the geom_line() function
+```{r, fig.caption= "**Figure 2. Number of Urchins present at Arroyo Quemado Reef, Carpinteria Reef, Isla Vista Reef, Mohawk Reef, and Naples Reef bewteeen the years of 2007 and 2020.** The number of Urchins observed incresed drastically betwen the year of 2008 and 2009, but has decresed at varying rates and intervals since. Specificaly,there was a sharp decrease in the observed urchins between the years of 2012 and 2013 along with between the years of 2019 and 2020." }
 ggplot(data= purple_urchins_total, aes(x= year_new,y=count)) +
   geom_line(aes(color=site_full, na.rm=TRUE))+
   scale_x_continuous(breaks= seq(from = 2007, to= 2020,by=1)) +
   labs(x="Year",
        y= "Urchin count",
-       title= "Urchins count by size and year",
+       title= "Urchins count by Size(cm) and year(2007-2020)",
        color="Site") 
   
 ```
-
+I do not think that 
